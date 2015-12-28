@@ -12,6 +12,9 @@ import UIKit
     func lockView(lockView: WSLockView, didFinishPath path: String)
 }
 
+
+
+
 public struct WSCircle {
     public var origin: CGPoint
     public var radius: CGFloat
