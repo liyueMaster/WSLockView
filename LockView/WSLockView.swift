@@ -37,7 +37,15 @@ public class WSLockView: UIView {
     public var btnSize: CGFloat = 74.0
     
     //按钮数量，仅限可以开平方且大于等于4的数字
-    public var btnCount: Int = 9
+    public var btnCount: Int = 9 {
+        didSet {
+            let x = Int(sqrt(Float(btnCount)))
+            
+            if x*x != btnCount {
+                btnCount = oldValue
+            }
+        }
+    }
     
     private lazy var columnCount: Int = {
         return Int(sqrt(Double(self.btnCount)))
