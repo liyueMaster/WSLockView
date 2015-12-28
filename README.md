@@ -11,6 +11,7 @@ swift实现的图形解锁
 func lockView(lockView: WSLockView, didFinishPath path: String)
 
 可自定义的属性有：
+
     //按钮大小
     public var btnSize: CGFloat = 74.0
     
