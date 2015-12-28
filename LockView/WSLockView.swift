@@ -3,7 +3,7 @@
 //  LockView
 //
 //  Created by 李越 on 15/12/25.
-//  Copyright © 2015年 北京中知智慧科技有限公司. All rights reserved.
+//  Copyright © 2015年 liyue. All rights reserved.
 //
 
 import UIKit
