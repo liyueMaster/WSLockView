@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController, WSLockViewDelegate {
     
     @IBOutlet weak var lockView: WSLockView!
+    @IBOutlet weak var imageView: UIImageView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +26,10 @@ class ViewController: UIViewController, WSLockViewDelegate {
     
     func lockView(lockView: WSLockView, didFinishPath path: String) {
         print(path)
+    }
+    
+    func lockView(lockView: WSLockView, didFinishImage image: UIImage!) {
+        imageView.image = image
     }
 
 }

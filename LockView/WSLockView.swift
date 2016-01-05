@@ -9,7 +9,8 @@
 import UIKit
 
 @objc public protocol WSLockViewDelegate {
-    func lockView(lockView: WSLockView, didFinishPath path: String)
+    optional func lockView(lockView: WSLockView, didFinishPath path: String)
+    optional func lockView(lockView: WSLockView, didFinishImage image: UIImage!)
 }
 
 public struct WSCircle {
@@ -36,9 +37,14 @@ public class WSLockView: UIView {
     //按钮大小
     public var btnSize: CGFloat = 74.0
     
-    //按钮数量，仅限可以开平方且大于等于4的数字
+    //按钮数量，仅限可以开平方且大于等于4的数字，并且不能大于99
     public var btnCount: Int = 9 {
         didSet {
+            if btnCount > 99 {
+                btnCount = oldValue
+                return
+            }
+            
             let x = Int(sqrt(Float(btnCount)))
             
             if x*x != btnCount {
@@ -204,13 +210,26 @@ public class WSLockView: UIView {
     }
     
     override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if self.delegate != nil {
-            var path = String()
-            self.selectedButtons.forEach { (btn: UIButton) -> () in
-                path = path.stringByAppendingFormat("%d", btn.tag)
-            }
-            self.delegate!.lockView(self, didFinishPath: path)
+        var path = String()
+        self.selectedButtons.forEach { (btn: UIButton) -> () in
+            path = path.stringByAppendingFormat("%02d", btn.tag)
         }
+        
+        self.delegate?.lockView?(self, didFinishPath: path)
+        
+        if self.currentPoint != nil {
+            self.currentPoint = nil
+            self.setNeedsDisplay()
+        }
+        
+        UIGraphicsBeginImageContext(self.bounds.size)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            self.layer.renderInContext(ctx)
+        }
+        let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        self.delegate?.lockView?(self, didFinishImage: thumbnail)
         
         //清空按钮
         self.selectedButtons.forEach { (btn: UIButton) -> () in
