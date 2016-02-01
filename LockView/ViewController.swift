@@ -17,6 +17,10 @@ class ViewController: UIViewController, WSLockViewDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         lockView.delegate = self
+        
+        print(TARGET_OS_IOS)
+        print(TARGET_OS_SIMULATOR)
+        print(TARGET_IPHONE_SIMULATOR)
     }
 
     override func didReceiveMemoryWarning() {
