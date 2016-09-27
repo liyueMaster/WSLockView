@@ -28,11 +28,11 @@ class ViewController: UIViewController, WSLockViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    func lockView(lockView: WSLockView, didFinishPath path: String) {
+    func lockView(_ lockView: WSLockView, didFinishPath path: String) {
         print(path)
     }
     
-    func lockView(lockView: WSLockView, didFinishImage image: UIImage!) {
+    func lockView(_ lockView: WSLockView, didFinishImage image: UIImage!) {
         imageView.image = image
     }
 

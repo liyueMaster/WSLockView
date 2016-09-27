@@ -9,8 +9,8 @@
 import UIKit
 
 @objc public protocol WSLockViewDelegate {
-    optional func lockView(lockView: WSLockView, didFinishPath path: String)
-    optional func lockView(lockView: WSLockView, didFinishImage image: UIImage!)
+    @objc optional func lockView(_ lockView: WSLockView, didFinishPath path: String)
+    @objc optional func lockView(_ lockView: WSLockView, didFinishImage image: UIImage!)
 }
 
 public struct WSCircle {
@@ -18,7 +18,7 @@ public struct WSCircle {
     public var radius: CGFloat
     
     init() {
-        self.origin = CGPointZero
+        self.origin = CGPoint.zero
         self.radius = 0
     }
     
@@ -28,17 +28,17 @@ public struct WSCircle {
     }
 }
 
-let kScreenWidth = UIScreen.mainScreen().bounds.size.width
+let kScreenWidth = UIScreen.main.bounds.size.width
 
-public class WSLockView: UIView {
+open class WSLockView: UIView {
     
-    public weak var delegate: WSLockViewDelegate?
+    open weak var delegate: WSLockViewDelegate?
     
     //按钮大小
-    public var btnSize: CGFloat = 74.0
+    open var btnSize: CGFloat = 74.0
     
     //按钮数量，仅限可以开平方且大于等于4的数字，并且不能大于99
-    public var btnCount: Int = 9 {
+    open var btnCount: Int = 9 {
         didSet {
             if btnCount > 99 {
                 btnCount = oldValue
@@ -53,23 +53,23 @@ public class WSLockView: UIView {
         }
     }
     
-    private lazy var columnCount: Int = {
+    fileprivate lazy var columnCount: Int = {
         return Int(sqrt(Double(self.btnCount)))
     }()
     
     //连线颜色
-    public lazy var lineColor: UIColor = UIColor.blueColor()
+    open lazy var lineColor: UIColor = UIColor.blue
     
     //连线宽度
-    public var lineWidth: CGFloat = 8.0
+    open var lineWidth: CGFloat = 8.0
     
     //使用圆形区域按钮
-    public var useCircleArea: Bool = true
+    open var useCircleArea: Bool = true
     
     //当前运动的点
-    private var currentPoint: CGPoint?
+    fileprivate var currentPoint: CGPoint?
     
-    private lazy var selectedButtons = [UIButton]()
+    fileprivate lazy var selectedButtons = [UIButton]()
     
     // MARK: - init
     
@@ -85,18 +85,18 @@ public class WSLockView: UIView {
         self.addButtons()
     }
     
-    private func addButtons() {
+    fileprivate func addButtons() {
         //边距
         let marginH: CGFloat = (self.frame.size.width - CGFloat(columnCount) * btnSize) / CGFloat(columnCount + 1)
         let marginV: CGFloat = (self.frame.size.height - CGFloat(columnCount) * btnSize) / CGFloat(columnCount + 1)
         
         for i in 0..<btnCount {
-            let btn = UIButton(type: .Custom)
+            let btn = UIButton(type: .custom)
             btn.tag = i
             
-            btn.setBackgroundImage(UIImage(named: "gesture_node_normal"), forState: .Normal)
-            btn.setBackgroundImage(UIImage(named: "gesture_node_highlighted"), forState: .Selected)
-            btn.userInteractionEnabled = false
+            btn.setBackgroundImage(UIImage(named: "gesture_node_normal"), for: UIControlState())
+            btn.setBackgroundImage(UIImage(named: "gesture_node_highlighted"), for: .selected)
+            btn.isUserInteractionEnabled = false
             
             let row = i / columnCount
             let col = i % columnCount
@@ -107,7 +107,7 @@ public class WSLockView: UIView {
             //y
             let btnY = marginV + CGFloat(row) * (btnSize + marginV)
             
-            btn.frame = CGRectMake(btnX, btnY, btnSize, btnSize)
+            btn.frame = CGRect(x: btnX, y: btnY, width: btnSize, height: btnSize)
             
             self.addSubview(btn)
         }
@@ -115,21 +115,21 @@ public class WSLockView: UIView {
     
     // MARK: - private functions
     
-    private func pointWith(touches: Set<UITouch>) -> CGPoint? {
+    fileprivate func pointWith(_ touches: Set<UITouch>) -> CGPoint? {
         let touch = (touches as NSSet).anyObject() as? UITouch
         
-        let point = touch?.locationInView(self)
+        let point = touch?.location(in: self)
         return point
     }
     
-    private func buttonWith(point: CGPoint) -> UIButton? {
+    fileprivate func buttonWith(_ point: CGPoint) -> UIButton? {
         for button in self.subviews {
             if useCircleArea {
                 if circleContainsPoint(WSCircle(origin: button.center, radius: button.frame.size.width / 2), point: point) {
                     return button as? UIButton
                 }
             } else {
-                if CGRectContainsPoint(button.frame, point) {
+                if button.frame.contains(point) {
                     return button as? UIButton
                 }
             }
@@ -138,7 +138,7 @@ public class WSLockView: UIView {
         return nil
     }
     
-    private func circleContainsPoint(circle: WSCircle, point: CGPoint) -> Bool {
+    fileprivate func circleContainsPoint(_ circle: WSCircle, point: CGPoint) -> Bool {
         let x = circle.origin.x - point.x
         let y = circle.origin.y - point.y
         
@@ -149,27 +149,27 @@ public class WSLockView: UIView {
     
     // MARK: - 绘图
 
-    override public func drawRect(rect: CGRect) {
+    override open func draw(_ rect: CGRect) {
         if self.selectedButtons.isEmpty {
             return
         }
         
         let path: UIBezierPath = UIBezierPath()
         path.lineWidth = lineWidth
-        path.lineJoinStyle = .Round
+        path.lineJoinStyle = .round
         
         lineColor.set()
         
-        for (index, btn) in self.selectedButtons.enumerate() {
+        for (index, btn) in self.selectedButtons.enumerated() {
             if index == 0 {
-                path.moveToPoint(btn.center)
+                path.move(to: btn.center)
             } else {
-                path.addLineToPoint(btn.center)
+                path.addLine(to: btn.center)
             }
         }
         
         if self.currentPoint != nil {
-            path.addLineToPoint(self.currentPoint!)
+            path.addLine(to: self.currentPoint!)
         }
         
         path.stroke()
@@ -177,7 +177,7 @@ public class WSLockView: UIView {
     
     // MARK: - 触摸方法
     
-    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = self.pointWith(touches) else {
             return
         }
@@ -186,20 +186,20 @@ public class WSLockView: UIView {
             return
         }
         
-        if btn.selected == false {
-            btn.selected = true
+        if btn.isSelected == false {
+            btn.isSelected = true
             self.selectedButtons.append(btn)
         }
     }
     
-    override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override open func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = self.pointWith(touches) else {
             return
         }
         
         if let btn = self.buttonWith(point) {
-            if btn.selected == false {
-                btn.selected = true
+            if btn.isSelected == false {
+                btn.isSelected = true
                 self.selectedButtons.append(btn)
             }
         }
@@ -209,10 +209,10 @@ public class WSLockView: UIView {
         self.setNeedsDisplay()
     }
     
-    override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         var path = String()
         self.selectedButtons.forEach { (btn: UIButton) -> () in
-            path = path.stringByAppendingFormat("%02d", btn.tag)
+            path = path.appendingFormat("%02d", btn.tag)
         }
         
         self.delegate?.lockView?(self, didFinishPath: path)
@@ -224,7 +224,7 @@ public class WSLockView: UIView {
         
         UIGraphicsBeginImageContext(self.bounds.size)
         if let ctx = UIGraphicsGetCurrentContext() {
-            self.layer.renderInContext(ctx)
+            self.layer.render(in: ctx)
         }
         let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -233,7 +233,7 @@ public class WSLockView: UIView {
         
         //清空按钮
         self.selectedButtons.forEach { (btn: UIButton) -> () in
-            btn.selected = false
+            btn.isSelected = false
         }
         
         self.selectedButtons.removeAll()
@@ -241,8 +241,8 @@ public class WSLockView: UIView {
         self.setNeedsDisplay()
     }
     
-    override public func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-        self.touchesEnded(((touches == nil) ? touches! : Set<UITouch>()), withEvent: event)
+    override open func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.touchesEnded(((touches == nil) ? touches : Set<UITouch>()), with: event)
     }
 
 }
